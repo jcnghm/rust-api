@@ -1,1 +1,6 @@
 /target
+/notes.txt
+/.vscode
+.env
+.env.local
+.env.*.local

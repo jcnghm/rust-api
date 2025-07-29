@@ -8,11 +8,13 @@ mod repositories;
 mod utils;
 mod errors;
 mod middleware;
+mod database;
 
 use config::AppConfig;
 use repositories::ObjectRepository;
 use services::{ObjectService, AuthService};
 use middleware::AuthMiddleware;
+use database::create_pool;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -24,14 +26,20 @@ async fn main() -> std::io::Result<()> {
         env_logger::Env::new().default_filter_or(&config.log_level)
     );
 
+    // Initialize database
+    let pool = create_pool(&config)
+        .await
+        .expect("Failed to create database pool");
+
     // Initialize dependencies
-    let object_repository = ObjectRepository::new();
+    let object_repository = ObjectRepository::new(pool);
     let object_service = ObjectService::new(object_repository);
     let auth_service = AuthService::new();
 
     // Print server start message and demo credentials
     println!("API Framework starting...");
     println!("Starting server at http://{}", config.server_address());
+    println!("Database: {}", config.database_url);
     println!("Demo credentials:");
     println!("  -- admin::password123 (admin role)");
     println!("  -- user::userpass (user role)");

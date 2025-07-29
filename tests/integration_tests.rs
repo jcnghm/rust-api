@@ -4,38 +4,56 @@ use rust_api_framework::{
     services::ObjectService,
 };
 use serde_json::json;
+use sqlx::SqlitePool;
 
-// Macro to create test app with proper route structure
-macro_rules! create_test_app {
-    () => {{
-        let object_repository = ObjectRepository::new();
-        let object_service = ObjectService::new(object_repository);
-        let auth_service = AuthService::new();
-
-        test::init_service(
-            App::new()
-                .app_data(web::Data::new(object_service))
-                .app_data(web::Data::new(auth_service.clone()))
-                // Public routes (no auth middleware)
-                .service(handlers::health_check)
-                .service(handlers::login)
-                // Protected routes (with auth middleware)
-                .service(
-                    web::scope("")
-                        .wrap(AuthMiddleware::new(auth_service))
-                        .service(handlers::hello)
-                        .service(handlers::get_objects)
-                        .service(handlers::create_object),
-                ),
+// Helper function to create test database pool
+async fn create_test_pool() -> SqlitePool {
+    let test_db_url = "sqlite::memory:";
+    let pool = SqlitePool::connect(test_db_url).await.unwrap();
+    
+    // Run migrations
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS objects (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            age INTEGER,
+            created_at DATETIME NOT NULL,
+            updated_at DATETIME NOT NULL
         )
-        .await
-    }};
+        "#
+    )
+    .execute(&pool)
+    .await
+    .unwrap();
+
+    sqlx::query(
+        r#"
+        CREATE INDEX IF NOT EXISTS idx_objects_email ON objects(email)
+        "#
+    )
+    .execute(&pool)
+    .await
+    .unwrap();
+
+    sqlx::query(
+        r#"
+        CREATE INDEX IF NOT EXISTS idx_objects_created_at ON objects(created_at)
+        "#
+    )
+    .execute(&pool)
+    .await
+    .unwrap();
+
+    pool
 }
 
 #[actix_web::test]
 async fn test_health_check() {
     // Create app without auth middleware for health check
-    let object_repository = ObjectRepository::new();
+    let pool = create_test_pool().await;
+    let object_repository = ObjectRepository::new(pool);
     let object_service = ObjectService::new(object_repository);
     let auth_service = AuthService::new();
 
@@ -62,7 +80,8 @@ async fn test_health_check() {
 #[actix_web::test]
 async fn test_login_success() {
     // Create app without auth middleware for login endpoint
-    let object_repository = ObjectRepository::new();
+    let pool = create_test_pool().await;
+    let object_repository = ObjectRepository::new(pool);
     let object_service = ObjectService::new(object_repository);
     let auth_service = AuthService::new();
 
@@ -101,7 +120,8 @@ async fn test_login_success() {
 #[actix_web::test]
 async fn test_login_invalid_credentials() {
     // Create app without auth middleware for login endpoint
-    let object_repository = ObjectRepository::new();
+    let pool = create_test_pool().await;
+    let object_repository = ObjectRepository::new(pool);
     let object_service = ObjectService::new(object_repository);
     let auth_service = AuthService::new();
 
@@ -132,7 +152,8 @@ async fn test_login_invalid_credentials() {
 
 #[actix_web::test]
 async fn test_protected_route_without_token() {
-    let object_repository = ObjectRepository::new();
+    let pool = create_test_pool().await;
+    let object_repository = ObjectRepository::new(pool);
     let object_service = ObjectService::new(object_repository);
     let auth_service = AuthService::new();
 
@@ -165,7 +186,28 @@ async fn test_protected_route_without_token() {
 
 #[actix_web::test]
 async fn test_protected_route_with_valid_token() {
-    let app = create_test_app!();
+    let pool = create_test_pool().await;
+    let object_repository = ObjectRepository::new(pool);
+    let object_service = ObjectService::new(object_repository);
+    let auth_service = AuthService::new();
+
+    let app = test::init_service(
+        App::new()
+            .app_data(web::Data::new(object_service))
+            .app_data(web::Data::new(auth_service.clone()))
+            // Public routes (no auth middleware)
+            .service(handlers::health_check)
+            .service(handlers::login)
+            // Protected routes (with auth middleware)
+            .service(
+                web::scope("")
+                    .wrap(AuthMiddleware::new(auth_service))
+                    .service(handlers::hello)
+                    .service(handlers::get_objects)
+                    .service(handlers::create_object),
+            ),
+    )
+    .await;
 
     // Get auth token
     let login_data = json!({
@@ -200,7 +242,8 @@ async fn test_protected_route_with_valid_token() {
 
 #[actix_web::test]
 async fn test_protected_route_with_invalid_token() {
-    let object_repository = ObjectRepository::new();
+    let pool = create_test_pool().await;
+    let object_repository = ObjectRepository::new(pool);
     let object_service = ObjectService::new(object_repository);
     let auth_service = AuthService::new();
 
@@ -233,7 +276,28 @@ async fn test_protected_route_with_invalid_token() {
 
 #[actix_web::test]
 async fn test_get_objects_empty() {
-    let app = create_test_app!();
+    let pool = create_test_pool().await;
+    let object_repository = ObjectRepository::new(pool);
+    let object_service = ObjectService::new(object_repository);
+    let auth_service = AuthService::new();
+
+    let app = test::init_service(
+        App::new()
+            .app_data(web::Data::new(object_service))
+            .app_data(web::Data::new(auth_service.clone()))
+            // Public routes (no auth middleware)
+            .service(handlers::health_check)
+            .service(handlers::login)
+            // Protected routes (with auth middleware)
+            .service(
+                web::scope("")
+                    .wrap(AuthMiddleware::new(auth_service))
+                    .service(handlers::hello)
+                    .service(handlers::get_objects)
+                    .service(handlers::create_object),
+            ),
+    )
+    .await;
 
     // Get auth token
     let login_data = json!({
@@ -274,7 +338,28 @@ async fn test_get_objects_empty() {
 
 #[actix_web::test]
 async fn test_create_object() {
-    let app = create_test_app!();
+    let pool = create_test_pool().await;
+    let object_repository = ObjectRepository::new(pool);
+    let object_service = ObjectService::new(object_repository);
+    let auth_service = AuthService::new();
+
+    let app = test::init_service(
+        App::new()
+            .app_data(web::Data::new(object_service))
+            .app_data(web::Data::new(auth_service.clone()))
+            // Public routes (no auth middleware)
+            .service(handlers::health_check)
+            .service(handlers::login)
+            // Protected routes (with auth middleware)
+            .service(
+                web::scope("")
+                    .wrap(AuthMiddleware::new(auth_service))
+                    .service(handlers::hello)
+                    .service(handlers::get_objects)
+                    .service(handlers::create_object),
+            ),
+    )
+    .await;
 
     // Get auth token
     let login_data = json!({

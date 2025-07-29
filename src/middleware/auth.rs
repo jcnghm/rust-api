@@ -1,6 +1,6 @@
 use actix_web::{
     dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
-    Error, HttpMessage, HttpResponse, ResponseError,
+    Error, HttpMessage, ResponseError,
     body::EitherBody,
 };
 use futures_util::future::LocalBoxFuture;

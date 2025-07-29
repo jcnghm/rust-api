@@ -1,6 +1,6 @@
 # API Framework - Built in Rust Actix Web
 
-A robust, secure REST API framework built with Rust and Actix Web, featuring JWT authentication, OAuth integration, and comprehensive CRUD operations.
+A robust, secure REST API framework built with Rust and Actix Web, featuring JWT authentication, OAuth integration, and comprehensive CRUD operations with SQLite database support.
 
 ## Features
 
@@ -9,6 +9,12 @@ A robust, secure REST API framework built with Rust and Actix Web, featuring JWT
 - OAuth integration for third-party authentication
 - Role-based access control (admin/user roles)
 - Secure token validation and refresh
+
+**Database Support**
+- SQLite database with SQLx ORM
+- Automatic database migrations
+- Connection pooling for optimal performance
+- Easy migration path to MySQL/PostgreSQL
 
 **API Capabilities**
 - RESTful CRUD operations for objects
@@ -27,7 +33,8 @@ A robust, secure REST API framework built with Rust and Actix Web, featuring JWT
 
 ### Prerequisites
 - Rust 1.70+ and Cargo
-- Environment variables configured (see `.env.example`)
+- SQLite3 (usually included with most systems)
+- Environment variables configured (see Configuration section)
 
 ### Installation
 
@@ -36,14 +43,41 @@ A robust, secure REST API framework built with Rust and Actix Web, featuring JWT
 git clone <repository-url>
 cd rust-api-framework
 
-# Copy environment template
-cp .env.example .env
+# Create data directory for SQLite database
+mkdir -p data
 
 # Install dependencies and run
 cargo run
 ```
 
-The server will start at `http://127.0.0.1:8080` by default.
+The server will start at `http://127.0.0.1:8080` by default with SQLite database at `./data/app.db`.
+
+## Database Setup
+
+The application automatically creates and migrates the SQLite database on startup. The database file is created at `./data/app.db` by default.
+
+### Manual Database Setup (Optional)
+If you want to manually initialize the database with sample data:
+
+```bash
+# Create the database file
+touch data/app.db
+
+# Run the initialization script
+sqlite3 data/app.db < scripts/init_db.sql
+```
+
+### Database Configuration
+The database URL can be configured via environment variables:
+
+```env
+DATABASE_URL=sqlite:./data/app.db
+```
+
+For future MySQL migration, you can change this to:
+```env
+DATABASE_URL=mysql://user:password@localhost/database_name
+```
 
 ## API Endpoints
 
@@ -94,17 +128,15 @@ Create a `.env` file in the project root:
 
 ```env
 # Server Configuration
-SERVER_ADDRESS=127.0.0.1:8080
+SERVER_HOST=127.0.0.1
+SERVER_PORT=8080
 LOG_LEVEL=info
 
-# Authentication
-JWT_SECRET=your-super-secret-jwt-key
-JWT_EXPIRATION=3600
+# Database Configuration
+DATABASE_URL=sqlite:./data/app.db
 
-# OAuth (optional)
-OAUTH_CLIENT_ID=your-oauth-client-id
-OAUTH_CLIENT_SECRET=your-oauth-client-secret
-OAUTH_REDIRECT_URI=http://localhost:8080/oauth/callback
+# Authentication
+JWT_SECRET=your-secret-key-here
 ```
 
 ## Development

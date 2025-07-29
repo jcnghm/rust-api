@@ -6,3 +6,4 @@ pub mod repositories;
 pub mod utils;
 pub mod errors;
 pub mod middleware;
+pub mod database;

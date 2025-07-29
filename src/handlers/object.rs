@@ -17,7 +17,7 @@ pub async fn get_objects(
 #[get("/objects/{id}")]
 pub async fn get_object(
     service: web::Data<ObjectService>,
-    path: web::Path<u32>,
+    path: web::Path<i32>,
 ) -> Result<HttpResponse> {
     let object_id = path.into_inner();
     
@@ -41,7 +41,7 @@ pub async fn create_object(
 #[put("/objects/{id}")]
 pub async fn update_object(
     service: web::Data<ObjectService>,
-    path: web::Path<u32>,
+    path: web::Path<i32>,
     req: web::Json<UpdateObjectRequest>,
 ) -> Result<HttpResponse> {
     let object_id = path.into_inner();
@@ -55,7 +55,7 @@ pub async fn update_object(
 #[patch("/objects/{id}")]
 pub async fn patch_object(
     service: web::Data<ObjectService>,
-    path: web::Path<u32>,
+    path: web::Path<i32>,
     req: web::Json<UpdateObjectRequest>,
 ) -> Result<HttpResponse> {
     let object_id = path.into_inner();
@@ -69,7 +69,7 @@ pub async fn patch_object(
 #[delete("/objects/{id}")]
 pub async fn delete_object(
     service: web::Data<ObjectService>,
-    path: web::Path<u32>,
+    path: web::Path<i32>,
 ) -> Result<HttpResponse> {
     let object_id = path.into_inner();
     
@@ -82,7 +82,7 @@ pub async fn delete_object(
 #[get("/objects/{id}/profile")]
 pub async fn get_object_profile(
     service: web::Data<ObjectService>,
-    path: web::Path<u32>,
+    path: web::Path<i32>,
 ) -> Result<HttpResponse> {
     let object_id = path.into_inner();
     

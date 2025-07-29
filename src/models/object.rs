@@ -1,25 +1,29 @@
 use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
+use chrono::{DateTime, Utc};
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, FromRow)]
 pub struct Object {
-    pub id: u32,
+    pub id: i32,
     pub name: String,
     pub email: String,
-    pub age: Option<u32>,
+    pub age: Option<i32>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
 
 #[derive(Deserialize, Debug)]
 pub struct CreateObjectRequest {
     pub name: String,
     pub email: String,
-    pub age: Option<u32>,
+    pub age: Option<i32>,
 }
 
 #[derive(Deserialize, Debug)]
 pub struct UpdateObjectRequest {
     pub name: Option<String>,
     pub email: Option<String>,
-    pub age: Option<u32>,
+    pub age: Option<i32>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -30,8 +34,16 @@ pub struct ObjectQuery {
 }
 
 impl Object {
-    pub fn new(id: u32, name: String, email: String, age: Option<u32>) -> Self {
-        Self { id, name, email, age }
+    pub fn new(id: i32, name: String, email: String, age: Option<i32>) -> Self {
+        let now = Utc::now();
+        Self { 
+            id, 
+            name, 
+            email, 
+            age,
+            created_at: now,
+            updated_at: now,
+        }
     }
 }
 

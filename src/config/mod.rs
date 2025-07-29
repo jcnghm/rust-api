@@ -13,7 +13,7 @@ impl AppConfig {
     pub fn new() -> Self {
         Self {
             database_url: env::var("DATABASE_URL")
-                .unwrap_or_else(|_| "mysql://app_user:password@localhost/your_app_db".to_string()),
+                .unwrap_or_else(|_| "sqlite:data/app.db".to_string()),
             server_host: env::var("SERVER_HOST")
                 .unwrap_or_else(|_| "127.0.0.1".to_string()),
             server_port: env::var("SERVER_PORT")

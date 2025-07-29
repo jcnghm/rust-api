@@ -21,7 +21,7 @@ impl ObjectService {
         self.repository.create(req).await
     }
 
-    pub async fn get_object(&self, id: u32) -> Result<Object, ApiError> {
+    pub async fn get_object(&self, id: i32) -> Result<Object, ApiError> {
         self.repository.find_by_id(id).await
     }
 
@@ -36,18 +36,18 @@ impl ObjectService {
         }))
     }
 
-    pub async fn update_object(&self, id: u32, req: UpdateObjectRequest) -> Result<Object, ApiError> {
+    pub async fn update_object(&self, id: i32, req: UpdateObjectRequest) -> Result<Object, ApiError> {
         // Validate input
         req.validate().map_err(ApiError::ValidationError)?;
 
         self.repository.update(id, req).await
     }
 
-    pub async fn delete_object(&self, id: u32) -> Result<(), ApiError> {
+    pub async fn delete_object(&self, id: i32) -> Result<(), ApiError> {
         self.repository.delete(id).await
     }
 
-    pub async fn get_object_profile(&self, id: u32) -> Result<serde_json::Value, ApiError> {
+    pub async fn get_object_profile(&self, id: i32) -> Result<serde_json::Value, ApiError> {
         let object = self.repository.find_by_id(id).await?;
         
         Ok(serde_json::json!({
@@ -56,7 +56,8 @@ impl ObjectService {
             "email": object.email,
             "age": object.age,
             "profile_url": format!("/objects/{}/profile", object.id),
-            "created_at": "2024-01-01T00:00:00Z" // Mock timestamp
+            "created_at": object.created_at,
+            "updated_at": object.updated_at
         }))
     }
 

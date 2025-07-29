@@ -1,6 +1,6 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
-use chrono::{DateTime, Utc};
 
 #[derive(Serialize, Deserialize, Clone, Debug, FromRow)]
 pub struct Object {
@@ -36,10 +36,10 @@ pub struct ObjectQuery {
 impl Object {
     pub fn new(id: i32, name: String, email: String, age: Option<i32>) -> Self {
         let now = Utc::now();
-        Self { 
-            id, 
-            name, 
-            email, 
+        Self {
+            id,
+            name,
+            email,
             age,
             created_at: now,
             updated_at: now,

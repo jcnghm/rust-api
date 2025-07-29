@@ -1,3 +1,6 @@
+use argon2::password_hash::SaltString;
+use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
+use rand_core::OsRng;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize)]
@@ -15,23 +18,22 @@ pub struct TokenResponse {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
-    pub sub: String,      // subject (username)
-    pub exp: i64,         // expiration time
-    pub iat: i64,         // issued at
-    pub role: String,     // user role
+    pub sub: String,  // subject using username
+    pub exp: i64,     // expiration time
+    pub iat: i64,     // issued at
+    pub role: String, // user role
 }
 
 #[derive(Clone)]
 pub struct User {
     pub username: String,
-    pub password_hash: String, // In production, this would be properly hashed
+    pub password_hash: String,
     pub role: String,
 }
 
 impl User {
     pub fn new(username: String, password: String, role: String) -> Self {
-        // In production, use proper password hashing like bcrypt
-        let password_hash = format!("hash_{}", password); // Simplified for demo
+        let password_hash = Self::hash_password(&password);
         Self {
             username,
             password_hash,
@@ -40,7 +42,24 @@ impl User {
     }
 
     pub fn verify_password(&self, password: &str) -> bool {
-        // In production, use proper password verification
-        self.password_hash == format!("hash_{}", password)
+        Self::verify_password_hash(password, &self.password_hash)
+    }
+
+    fn hash_password(password: &str) -> String {
+        let salt = SaltString::generate(&mut OsRng);
+        let argon2 = Argon2::default();
+
+        argon2
+            .hash_password(password.as_bytes(), &salt)
+            .expect("Failed to hash password")
+            .to_string()
+    }
+
+    fn verify_password_hash(password: &str, hash: &str) -> bool {
+        let parsed_hash = PasswordHash::new(hash).expect("Failed to parse hash");
+
+        Argon2::default()
+            .verify_password(password.as_bytes(), &parsed_hash)
+            .is_ok()
     }
 }

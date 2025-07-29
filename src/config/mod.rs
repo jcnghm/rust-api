@@ -14,15 +14,12 @@ impl AppConfig {
         Self {
             database_url: env::var("DATABASE_URL")
                 .unwrap_or_else(|_| "sqlite:data/app.db".to_string()),
-            server_host: env::var("SERVER_HOST")
-                .unwrap_or_else(|_| "127.0.0.1".to_string()),
+            server_host: env::var("SERVER_HOST").unwrap_or_else(|_| "127.0.0.1".to_string()),
             server_port: env::var("SERVER_PORT")
                 .unwrap_or_else(|_| "8080".to_string())
                 .parse()
                 .expect("SERVER_PORT must be a valid number"),
-            log_level: env::var("LOG_LEVEL")
-                .unwrap_or_else(|_| "info".to_string()),
-            
+            log_level: env::var("LOG_LEVEL").unwrap_or_else(|_| "info".to_string()),
         }
     }
 

@@ -1,30 +1,28 @@
-use actix_web::{web, App, HttpServer, middleware::Logger};
+use actix_web::{App, HttpServer, middleware::Logger, web};
 
 mod config;
-mod models;
-mod handlers;
-mod services;
-mod repositories;
-mod utils;
-mod errors;
-mod middleware;
 mod database;
+mod errors;
+mod handlers;
+mod middleware;
+mod models;
+mod repositories;
+mod services;
+mod utils;
 
 use config::AppConfig;
-use repositories::ObjectRepository;
-use services::{ObjectService, AuthService};
-use middleware::AuthMiddleware;
 use database::create_pool;
+use middleware::AuthMiddleware;
+use repositories::{EmployeeRepository, ObjectRepository};
+use services::{AuthService, EmployeeService, ObjectService};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     // Initialize configuration
     let config = AppConfig::new();
-    
+
     // Initialize logging
-    env_logger::init_from_env(
-        env_logger::Env::new().default_filter_or(&config.log_level)
-    );
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or(&config.log_level));
 
     // Initialize database
     let pool = create_pool(&config)
@@ -32,8 +30,10 @@ async fn main() -> std::io::Result<()> {
         .expect("Failed to create database pool");
 
     // Initialize dependencies
-    let object_repository = ObjectRepository::new(pool);
+    let object_repository = ObjectRepository::new(pool.clone());
     let object_service = ObjectService::new(object_repository);
+    let employee_repository = EmployeeRepository::new(pool);
+    let employee_service = EmployeeService::new(employee_repository);
     let auth_service = AuthService::new();
 
     // Print server start message and demo credentials
@@ -47,6 +47,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(object_service.clone()))
+            .app_data(web::Data::new(employee_service.clone()))
             .app_data(web::Data::new(auth_service.clone()))
             .wrap(Logger::default())
             .wrap(AuthMiddleware::new(auth_service.clone()))
@@ -68,6 +69,10 @@ async fn main() -> std::io::Result<()> {
             .service(handlers::delete_object)
             .service(handlers::get_object_profile)
             .service(handlers::get_stats)
+            // Employee GET routes (protected)
+            .service(handlers::get_employees)
+            .service(handlers::get_employee)
+            .service(handlers::get_employees_by_store)
     })
     .bind(config.server_address())?
     .run()

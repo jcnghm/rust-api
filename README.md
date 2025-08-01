@@ -18,7 +18,7 @@ A robust, secure REST API framework built with Rust and Actix Web, featuring JWT
 
 **API Capabilities**
 - RESTful CRUD operations for objects
-- Health check endpoints
+- Health check endpoint
 - Request/response logging
 - Structured error handling
 - Environment-based configuration
@@ -33,7 +33,7 @@ A robust, secure REST API framework built with Rust and Actix Web, featuring JWT
 
 ### Prerequisites
 - Rust 1.70+ and Cargo
-- SQLite3 (usually included with most systems)
+- SQLite3
 - Environment variables configured (see Configuration section)
 
 ### Installation
@@ -199,14 +199,6 @@ CMD ["rust-api-framework"]
 
 ### Environment Setup
 Ensure all required environment variables are set in your deployment environment.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ## License
 

@@ -1,6 +1,6 @@
 # API Framework - Built in Rust Actix Web
 
-A robust, secure REST API framework built with Rust and Actix Web, featuring JWT authentication, OAuth integration, and comprehensive CRUD operations with SQLite database support.
+A REST API framework built with Rust and Actix Web, featuring JWT authentication, OAuth integration, and comprehensive CRUD operations with SQLite database support.
 
 ## Features
 
@@ -24,7 +24,6 @@ A robust, secure REST API framework built with Rust and Actix Web, featuring JWT
 - Environment-based configuration
 
 **Architecture**
-- Clean separation of concerns
 - Modular handler organization
 - Reusable middleware components
 - Repository pattern for data access

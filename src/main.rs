@@ -19,6 +19,7 @@ use services::{AuthService, EmployeeService, ObjectService};
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     // Initialize configuration
+    // TEST
     let config = AppConfig::new();
 
     // Initialize logging

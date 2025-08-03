@@ -97,8 +97,6 @@ All endpoints below require `Authorization: Bearer <token>` header:
 - `PUT /objects/{id}` - Update object
 - `PATCH /objects/{id}` - Partial update
 - `DELETE /objects/{id}` - Delete object
-- `GET /objects/{id}/profile` - Get object profile
-- `GET /stats` - Get system statistics
 
 ## Authentication
 
@@ -137,67 +135,6 @@ DATABASE_URL=sqlite:./data/app.db
 # Authentication
 JWT_SECRET=your-secret-key-here
 ```
-
-## Development
-
-### Running Tests
-```bash
-cargo test
-```
-
-### Code Formatting
-```bash
-cargo fmt
-```
-
-### Linting
-```bash
-cargo clippy
-```
-
-### Running with Different Log Levels
-```bash
-RUST_LOG=debug cargo run
-```
-
-## API Testing
-
-### Using curl
-```bash
-# Get authentication token
-TOKEN=$(curl -s -X POST http://localhost:8080/token \
-  -H "Content-Type: application/json" \
-  -d '{"username": "admin", "password": "password123"}' \
-  | jq -r '.token')
-
-# Create an object
-curl -X POST http://localhost:8080/objects \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Test Object", "description": "A test object"}'
-```
-
-### Using Postman
-Import the provided Postman collection and environment variables for comprehensive API testing.
-
-## Deployment
-
-### Docker (Optional)
-```dockerfile
-FROM rust:1.70 as builder
-WORKDIR /app
-COPY . .
-RUN cargo build --release
-
-FROM debian:bookworm-slim
-RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
-COPY --from=builder /app/target/release/rust-api-framework /usr/local/bin/
-EXPOSE 8080
-CMD ["rust-api-framework"]
-```
-
-### Environment Setup
-Ensure all required environment variables are set in your deployment environment.
 
 ## License
 

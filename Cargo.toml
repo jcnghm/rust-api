@@ -12,11 +12,11 @@ env_logger = "0.10"
 jsonwebtoken = "9.0"
 chrono = { version = "0.4", features = ["serde"] }
 sha2 = "0.10"
-base64 = "0.21"
+base64 = "0.22"
 argon2 = "0.5"
 rand_core = { version = "0.6", features = ["getrandom"] }
 futures-util = "0.3"
-sqlx = { version = "0.7", features = ["runtime-tokio-native-tls", "sqlite", "chrono", "uuid"] }
+sqlx = { version = "0.8.6", features = ["runtime-tokio-native-tls", "sqlite", "chrono", "uuid"] }
 uuid = { version = "1.0", features = ["v4", "serde"] }
 
 [dev-dependencies]

@@ -157,7 +157,7 @@ async fn test_protected_route_with_valid_token() {
     // Extract token from the actual response format
     let token = body["data"]["access_token"].as_str().unwrap();
 
-    // Test protected route with valid token - use /objects which we know works
+    // Test protected route with valid token
     let req = test::TestRequest::get()
         .uri("/objects")
         .insert_header(("Authorization", format!("Bearer {}", token)))

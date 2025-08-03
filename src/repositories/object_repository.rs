@@ -1,7 +1,7 @@
-use crate::models::object::*;
 use crate::errors::ApiError;
-use sqlx::{SqlitePool, Row};
+use crate::models::object::*;
 use chrono::Utc;
+use sqlx::{Row, SqlitePool};
 
 #[derive(Clone)]
 pub struct ObjectRepository {
@@ -15,12 +15,12 @@ impl ObjectRepository {
 
     pub async fn create(&self, req: CreateObjectRequest) -> Result<Object, ApiError> {
         let now = Utc::now();
-        
+
         let result = sqlx::query(
             r#"
             INSERT INTO objects (name, email, age, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?)
-            "#
+            "#,
         )
         .bind(&req.name)
         .bind(&req.email)
@@ -41,7 +41,7 @@ impl ObjectRepository {
             SELECT id, name, email, age, created_at, updated_at
             FROM objects
             WHERE id = ?
-            "#
+            "#,
         )
         .bind(id)
         .fetch_optional(&self.pool)
@@ -63,7 +63,8 @@ impl ObjectRepository {
 
     pub async fn find_all(&self, query: ObjectQuery) -> Result<(Vec<Object>, usize), ApiError> {
         // Build the base query
-        let mut sql = String::from("SELECT id, name, email, age, created_at, updated_at FROM objects");
+        let mut sql =
+            String::from("SELECT id, name, email, age, created_at, updated_at FROM objects");
         let mut count_sql = String::from("SELECT COUNT(*) FROM objects");
         let mut conditions = Vec::new();
         let mut params: Vec<String> = Vec::new();
@@ -191,32 +192,5 @@ impl ObjectRepository {
         }
 
         Ok(())
-    }
-
-    pub async fn get_stats(&self) -> Result<serde_json::Value, ApiError> {
-        let total_objects: i64 = sqlx::query("SELECT COUNT(*) FROM objects")
-            .fetch_one(&self.pool)
-            .await
-            .map_err(|e| ApiError::InternalServerError(format!("Database error: {}", e)))?
-            .get(0);
-
-        let objects_with_age: i64 = sqlx::query("SELECT COUNT(*) FROM objects WHERE age IS NOT NULL")
-            .fetch_one(&self.pool)
-            .await
-            .map_err(|e| ApiError::InternalServerError(format!("Database error: {}", e)))?
-            .get(0);
-
-        let average_age: Option<f64> = sqlx::query("SELECT AVG(age) FROM objects WHERE age IS NOT NULL")
-            .fetch_one(&self.pool)
-            .await
-            .map_err(|e| ApiError::InternalServerError(format!("Database error: {}", e)))?
-            .get(0);
-
-        Ok(serde_json::json!({
-            "total_objects": total_objects,
-            "objects_with_age": objects_with_age,
-            "average_age": average_age.unwrap_or(0.0),
-            "server_uptime": "unknown"
-        }))
     }
 }

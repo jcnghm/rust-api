@@ -55,7 +55,7 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     .execute(pool)
     .await?;
 
-    // Create index on email for faster lookups
+    // Create index on email
     sqlx::query(
         r#"
         CREATE INDEX IF NOT EXISTS idx_objects_email ON objects(email)
@@ -64,7 +64,7 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     .execute(pool)
     .await?;
 
-    // Create index on created_at for faster sorting
+    // Create index on created_at
     sqlx::query(
         r#"
         CREATE INDEX IF NOT EXISTS idx_objects_created_at ON objects(created_at)
@@ -88,7 +88,7 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     .execute(pool)
     .await?;
 
-    // Create index on store_id for faster lookups
+    // Create index on store_id
     sqlx::query(
         r#"
         CREATE INDEX IF NOT EXISTS idx_employees_store_id ON employees(store_id)
@@ -97,7 +97,7 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     .execute(pool)
     .await?;
 
-    // Create index on external_id for faster lookups
+    // Create index on external_id
     sqlx::query(
         r#"
         CREATE INDEX IF NOT EXISTS idx_employees_external_id ON employees(external_id)
@@ -106,7 +106,7 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     .execute(pool)
     .await?;
 
-    // Create index on last_name, first_name for faster sorting
+    // Create index on last_name, first_name
     sqlx::query(
         r#"
         CREATE INDEX IF NOT EXISTS idx_employees_name ON employees(last_name, first_name)

@@ -7,10 +7,6 @@ pub async fn hello() -> Result<HttpResponse> {
     Ok(HttpResponse::Ok().json(ApiResponse::success_no_data("Hello world!")))
 }
 
-pub async fn manual_hello() -> Result<HttpResponse> {
-    Ok(HttpResponse::Ok().json(ApiResponse::success_no_data("Hey there!")))
-}
-
 #[post("/echo")]
 pub async fn echo(req_body: String) -> Result<HttpResponse> {
     Ok(HttpResponse::Ok().json(ApiResponse::success(

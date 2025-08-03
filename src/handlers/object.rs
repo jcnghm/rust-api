@@ -78,26 +78,3 @@ pub async fn delete_object(
         Err(e) => Ok(e.error_response()),
     }
 }
-
-#[get("/objects/{id}/profile")]
-pub async fn get_object_profile(
-    service: web::Data<ObjectService>,
-    path: web::Path<i32>,
-) -> Result<HttpResponse> {
-    let object_id = path.into_inner();
-    
-    match service.get_object_profile(object_id).await {
-        Ok(profile) => Ok(HttpResponse::Ok().json(ApiResponse::success(profile, "Profile retrieved"))),
-        Err(e) => Ok(e.error_response()),
-    }
-}
-
-#[get("/stats")]
-pub async fn get_stats(
-    service: web::Data<ObjectService>,
-) -> Result<HttpResponse> {
-    match service.get_stats().await {
-        Ok(stats) => Ok(HttpResponse::Ok().json(ApiResponse::success(stats, "Statistics retrieved"))),
-        Err(e) => Ok(e.error_response()),
-    }
-}

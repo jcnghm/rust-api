@@ -24,7 +24,7 @@ where
     S::Future: 'static,
     B: 'static,
 {
-    type Response = ServiceResponse<EitherBody<B>>;  // Changed this line
+    type Response = ServiceResponse<EitherBody<B>>;
     type Error = Error;
     type InitError = ();
     type Transform = AuthMiddlewareService<S>;
@@ -49,7 +49,7 @@ where
     S::Future: 'static,
     B: 'static,
 {
-    type Response = ServiceResponse<EitherBody<B>>;  // Changed this line
+    type Response = ServiceResponse<EitherBody<B>>;
     type Error = Error;
     type Future = LocalBoxFuture<'static, Result<Self::Response, Self::Error>>;
 
@@ -58,7 +58,7 @@ where
     fn call(&self, req: ServiceRequest) -> Self::Future {
         let auth_service = self.auth_service.clone();
         
-        // Skip authentication for login endpoint and health check
+        // Skip authentication for login endpoint
         let path = req.path();
         if path == "/token" {
             let fut = self.service.call(req);

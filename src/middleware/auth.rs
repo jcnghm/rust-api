@@ -68,7 +68,7 @@ where
             });
         }
 
-        // Extract Authorization header
+        // Extract Authorization header and remove "Bearer " prefix if it exists
         let auth_header = req.headers().get("Authorization");
         
         let token = match auth_header {
@@ -76,12 +76,12 @@ where
                 match header.to_str() {
                     Ok(header_str) => {
                         if header_str.starts_with("Bearer ") {
-                            &header_str[7..] // Remove "Bearer " prefix
+                            &header_str[7..]
                         } else {
                             return Box::pin(async move {
                                 let response = ApiError::BadRequest("Invalid authorization header format".to_string())
                                     .error_response()
-                                    .map_into_right_body();  // Map to EitherBody::Right
+                                    .map_into_right_body();
                                 Ok(ServiceResponse::new(req.into_parts().0, response))
                             });
                         }
@@ -90,7 +90,7 @@ where
                         return Box::pin(async move {
                             let response = ApiError::BadRequest("Invalid authorization header".to_string())
                                 .error_response()
-                                .map_into_right_body();  // Map to EitherBody::Right
+                                .map_into_right_body();
                             Ok(ServiceResponse::new(req.into_parts().0, response))
                         });
                     }
@@ -100,7 +100,7 @@ where
                 return Box::pin(async move {
                     let response = ApiError::BadRequest("Missing authorization header".to_string())
                         .error_response()
-                        .map_into_right_body();  // Map to EitherBody::Right
+                        .map_into_right_body();
                     Ok(ServiceResponse::new(req.into_parts().0, response))
                 });
             }
@@ -114,13 +114,13 @@ where
                 let fut = self.service.call(req);
                 Box::pin(async move { 
                     let res = fut.await?;
-                    Ok(res.map_into_left_body())  // Map to EitherBody::Left
+                    Ok(res.map_into_left_body())
                 })
             }
             Err(e) => {
                 Box::pin(async move {
                     let response = e.error_response()
-                        .map_into_right_body();  // Map to EitherBody::Right
+                        .map_into_right_body();
                     Ok(ServiceResponse::new(req.into_parts().0, response))
                 })
             }

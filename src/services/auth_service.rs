@@ -15,7 +15,7 @@ impl AuthService {
     pub fn new() -> Self {
         let mut users = HashMap::new();
         
-        // Add some demo users (in production, load from database)
+        // Add some demo users
         users.insert(
             "admin".to_string(),
             User::new("admin".to_string(), "password123".to_string(), "admin".to_string())
@@ -29,7 +29,7 @@ impl AuthService {
             users,
             jwt_secret: std::env::var("JWT_SECRET")
                 .unwrap_or_else(|_| "your-secret-key-change-in-production".to_string()),
-            token_duration: Duration::hours(1), // 1 hour token lifetime
+            token_duration: Duration::hours(1),
         }
     }
 

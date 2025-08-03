@@ -161,7 +161,7 @@ async fn seed_employees(pool: &SqlitePool) -> Result<(), sqlx::Error> {
             .await?;
         }
 
-        println!("✅ Seeded {} employees", employee_count);
+        println!("Seeded {} employees", employee_count);
     }
 
     Ok(())

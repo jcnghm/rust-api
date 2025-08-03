@@ -13,10 +13,7 @@ impl ObjectService {
     }
 
     pub async fn create_object(&self, req: CreateObjectRequest) -> Result<Object, ApiError> {
-        // Validate input
         req.validate().map_err(ApiError::ValidationError)?;
-
-        // Business logic could go here (e.g., duplicate email check, etc.)
 
         self.repository.create(req).await
     }
@@ -41,7 +38,6 @@ impl ObjectService {
         id: i32,
         req: UpdateObjectRequest,
     ) -> Result<Object, ApiError> {
-        // Validate input
         req.validate().map_err(ApiError::ValidationError)?;
 
         self.repository.update(id, req).await

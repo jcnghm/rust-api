@@ -88,14 +88,11 @@ DATABASE_URL=mysql://user:password@localhost/database_name
 
 - `POST /token` - Login with username/password
 
-### Public Endpoints
-
-- `GET /health` - Health check
-
 ### Protected Endpoints
 
 All endpoints below require `Authorization: Bearer <token>` header:
 
+- `GET /health` - Health check
 - `GET /objects` - List all objects
 - `GET /objects/{id}` - Get specific object
 - `POST /objects` - Create new object

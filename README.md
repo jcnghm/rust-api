@@ -1,4 +1,4 @@
-# API Framework - Built in Rust, Actix Web
+# Actix Web Rust API
 
 A REST API framework built with Rust and Actix Web, featuring JWT authentication, and CRUD operations with SQLite database support.
 

@@ -1,7 +1,10 @@
+<div align="center">
+  <img src="https://raw.githubusercontent.com/rust-lang/rust-artwork/master/logo/rust-logo-256x256.png" alt="Rust Logo" width="100">
+  
 # Actix Web Rust API
 
 A REST API framework built with Rust and Actix Web, featuring JWT authentication, and CRUD operations with SQLite database support.
-
+</div>
 ## Features
 
 **Authentication & Authorization**

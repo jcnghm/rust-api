@@ -5,6 +5,7 @@
 
 A REST API framework built with Rust and Actix Web, featuring JWT authentication, and CRUD operations with SQLite database support.
 </div>
+
 ## Features
 
 **Authentication & Authorization**

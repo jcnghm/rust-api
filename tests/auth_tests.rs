@@ -10,7 +10,6 @@ use serde_json::json;
 
 #[actix_web::test]
 async fn test_login_success() {
-    // Create app without auth middleware for login endpoint
     let pool = create_test_pool().await;
     let object_repository = ObjectRepository::new(pool);
     let object_service = ObjectService::new(object_repository);
@@ -50,7 +49,6 @@ async fn test_login_success() {
 
 #[actix_web::test]
 async fn test_login_invalid_credentials() {
-    // Create app without auth middleware for login endpoint
     let pool = create_test_pool().await;
     let object_repository = ObjectRepository::new(pool);
     let object_service = ObjectService::new(object_repository);
@@ -139,7 +137,6 @@ async fn test_protected_route_with_valid_token() {
     )
     .await;
 
-    // Get auth token
     let login_data = json!({
         "username": "admin",
         "password": "password123"
@@ -154,10 +151,8 @@ async fn test_protected_route_with_valid_token() {
     let body: serde_json::Value = test::read_body_json(resp).await;
     println!("Login response for token extraction: {:?}", body);
 
-    // Extract token from the actual response format
     let token = body["data"]["access_token"].as_str().unwrap();
 
-    // Test protected route with valid token
     let req = test::TestRequest::get()
         .uri("/objects")
         .insert_header(("Authorization", format!("Bearer {}", token)))

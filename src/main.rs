@@ -20,13 +20,10 @@ use services::{AuthService, EmployeeService, ObjectService};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    // Initialize configuration
     let config = AppConfig::new();
 
-    // Initialize logging
     env_logger::init_from_env(env_logger::Env::new().default_filter_or(&config.log_level));
 
-    // Print configuration and start server message
     println!("--------------------------------");
     println!(
         "Logging initialized with level: {}",

@@ -3,7 +3,6 @@ use sqlx::{Row, SqlitePool, sqlite::SqlitePoolOptions};
 use std::path::Path;
 
 pub async fn create_pool(config: &AppConfig) -> Result<SqlitePool, sqlx::Error> {
-    // Ensure the database directory exists
     if let Some(db_path) = extract_db_path(&config.database_url) {
         if let Some(parent) = Path::new(db_path).parent() {
             std::fs::create_dir_all(parent).map_err(|e| {
@@ -19,10 +18,8 @@ pub async fn create_pool(config: &AppConfig) -> Result<SqlitePool, sqlx::Error> 
         .connect(&config.database_url)
         .await?;
 
-    // Run migrations
     run_migrations(&pool).await?;
 
-    // Seed test data
     seed_employees(&pool).await?;
 
     Ok(pool)
@@ -30,16 +27,15 @@ pub async fn create_pool(config: &AppConfig) -> Result<SqlitePool, sqlx::Error> 
 
 fn extract_db_path(database_url: &str) -> Option<&str> {
     if database_url.starts_with("sqlite://") {
-        Some(&database_url[9..]) // Remove "sqlite://" prefix
+        Some(&database_url[9..])
     } else if database_url.starts_with("sqlite:") {
-        Some(&database_url[7..]) // Remove "sqlite:" prefix
+        Some(&database_url[7..])
     } else {
         None
     }
 }
 
 async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
-    // Create objects table if it doesn't exist
     sqlx::query(
         r#"
         CREATE TABLE IF NOT EXISTS objects (
@@ -55,7 +51,6 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     .execute(pool)
     .await?;
 
-    // Create index on email
     sqlx::query(
         r#"
         CREATE INDEX IF NOT EXISTS idx_objects_email ON objects(email)
@@ -64,7 +59,6 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     .execute(pool)
     .await?;
 
-    // Create index on created_at
     sqlx::query(
         r#"
         CREATE INDEX IF NOT EXISTS idx_objects_created_at ON objects(created_at)
@@ -73,7 +67,6 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     .execute(pool)
     .await?;
 
-    // Create employees table if it doesn't exist
     sqlx::query(
         r#"
         CREATE TABLE IF NOT EXISTS employees (
@@ -88,7 +81,6 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     .execute(pool)
     .await?;
 
-    // Create index on store_id
     sqlx::query(
         r#"
         CREATE INDEX IF NOT EXISTS idx_employees_store_id ON employees(store_id)
@@ -97,7 +89,6 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     .execute(pool)
     .await?;
 
-    // Create index on external_id
     sqlx::query(
         r#"
         CREATE INDEX IF NOT EXISTS idx_employees_external_id ON employees(external_id)
@@ -106,7 +97,6 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     .execute(pool)
     .await?;
 
-    // Create index on last_name, first_name
     sqlx::query(
         r#"
         CREATE INDEX IF NOT EXISTS idx_employees_name ON employees(last_name, first_name)
@@ -119,13 +109,11 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
 }
 
 async fn seed_employees(pool: &SqlitePool) -> Result<(), sqlx::Error> {
-    // Check if employees table already has data
     let count: i64 = sqlx::query("SELECT COUNT(*) FROM employees")
         .fetch_one(pool)
         .await?
         .get(0);
 
-    // Only seed if table is empty
     if count == 0 {
         println!("Seeding employee test data...");
 

@@ -58,7 +58,6 @@ where
     fn call(&self, req: ServiceRequest) -> Self::Future {
         let auth_service = self.auth_service.clone();
         
-        // Skip authentication for login endpoint
         let path = req.path();
         if path == "/token" {
             let fut = self.service.call(req);
@@ -68,7 +67,6 @@ where
             });
         }
 
-        // Extract Authorization header and remove "Bearer " prefix if it exists
         let auth_header = req.headers().get("Authorization");
         
         let token = match auth_header {
@@ -106,7 +104,6 @@ where
             }
         };
 
-        // Verify token
         match auth_service.verify_token(token) {
             Ok(claims) => {
                 // Add claims to request extensions for use in handlers

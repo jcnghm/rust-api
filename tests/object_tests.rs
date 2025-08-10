@@ -10,7 +10,6 @@ use serde_json::json;
 
 #[actix_web::test]
 async fn test_health_check() {
-    // Create app without auth middleware for health check
     let pool = create_test_pool().await;
     let object_repository = ObjectRepository::new(pool);
     let object_service = ObjectService::new(object_repository);
@@ -61,7 +60,6 @@ async fn test_get_objects_empty() {
     )
     .await;
 
-    // Get auth token
     let login_data = json!({
         "username": "admin",
         "password": "password123"
@@ -76,7 +74,6 @@ async fn test_get_objects_empty() {
     let body: serde_json::Value = test::read_body_json(resp).await;
     let token = body["data"]["access_token"].as_str().unwrap();
 
-    // Test get objects endpoint
     let req = test::TestRequest::get()
         .uri("/objects")
         .insert_header(("Authorization", format!("Bearer {}", token)))
@@ -120,7 +117,6 @@ async fn test_create_object() {
     )
     .await;
 
-    // Get auth token
     let login_data = json!({
         "username": "admin",
         "password": "password123"
@@ -135,7 +131,6 @@ async fn test_create_object() {
     let body: serde_json::Value = test::read_body_json(resp).await;
     let token = body["data"]["access_token"].as_str().unwrap();
 
-    // Test create object endpoint
     let object_data = json!({
         "name": "Test Object",
         "email": "test@test.com"
@@ -186,7 +181,6 @@ async fn test_create_and_get_objects() {
     )
     .await;
 
-    // Get auth token
     let login_data = json!({
         "username": "admin",
         "password": "password123"
@@ -201,7 +195,6 @@ async fn test_create_and_get_objects() {
     let body: serde_json::Value = test::read_body_json(resp).await;
     let token = body["data"]["access_token"].as_str().unwrap();
 
-    // Create an object
     let object_data = json!({
         "name": "Integration Test Object",
         "email": "integration@test.com"
@@ -216,7 +209,6 @@ async fn test_create_and_get_objects() {
     let resp = test::call_service(&app, req).await;
     assert_eq!(resp.status(), StatusCode::CREATED);
 
-    // Now get objects and verify the created object is there
     let req = test::TestRequest::get()
         .uri("/objects")
         .insert_header(("Authorization", format!("Bearer {}", token)))

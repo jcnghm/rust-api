@@ -34,16 +34,13 @@ impl AuthService {
     }
 
     pub async fn authenticate(&self, login_req: LoginRequest) -> Result<TokenResponse, ApiError> {
-        // Find user
         let user = self.users.get(&login_req.username)
             .ok_or_else(|| ApiError::BadRequest("Invalid credentials".to_string()))?;
 
-        // Verify password
         if !user.verify_password(&login_req.password) {
             return Err(ApiError::BadRequest("Invalid credentials".to_string()));
         }
 
-        // Create JWT token
         let now = Utc::now();
         let expires_at = now + self.token_duration;
         

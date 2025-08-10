@@ -40,7 +40,6 @@ async fn test_get_employees_success() {
     )
     .await;
 
-    // Get auth token
     let login_data = json!({
         "username": "admin",
         "password": "password123"
@@ -71,7 +70,7 @@ async fn test_get_employees_success() {
     assert!(body["success"].as_bool().unwrap());
     assert!(body["data"]["employees"].is_array());
     assert_eq!(body["data"]["total"].as_u64().unwrap(), 12);
-    assert_eq!(body["data"]["employees"].as_array().unwrap().len(), 10); // default limit
+    assert_eq!(body["data"]["employees"].as_array().unwrap().len(), 10);
 }
 
 #[actix_web::test]
@@ -104,7 +103,6 @@ async fn test_get_employees_with_limit() {
     )
     .await;
 
-    // Get auth token
     let login_data = json!({
         "username": "admin",
         "password": "password123"
@@ -167,7 +165,6 @@ async fn test_get_employee_by_id_success() {
     )
     .await;
 
-    // Get auth token
     let login_data = json!({
         "username": "admin",
         "password": "password123"
@@ -232,7 +229,6 @@ async fn test_get_employee_by_id_not_found() {
     )
     .await;
 
-    // Get auth token
     let login_data = json!({
         "username": "admin",
         "password": "password123"

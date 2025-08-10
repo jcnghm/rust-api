@@ -62,35 +62,29 @@ impl ObjectRepository {
     }
 
     pub async fn find_all(&self, query: ObjectQuery) -> Result<(Vec<Object>, usize), ApiError> {
-        // Build the base query
         let mut sql =
             String::from("SELECT id, name, email, age, created_at, updated_at FROM objects");
         let mut count_sql = String::from("SELECT COUNT(*) FROM objects");
         let mut conditions = Vec::new();
         let mut params: Vec<String> = Vec::new();
 
-        // Add name filter if provided
         if let Some(name) = &query.name {
             conditions.push("name LIKE ?");
             params.push(format!("%{}%", name));
         }
 
-        // Add WHERE clause if conditions exist
         if !conditions.is_empty() {
             let where_clause = conditions.join(" AND ");
             sql.push_str(&format!(" WHERE {}", where_clause));
             count_sql.push_str(&format!(" WHERE {}", where_clause));
         }
 
-        // Add ORDER BY
         sql.push_str(" ORDER BY created_at DESC");
 
-        // Add LIMIT and OFFSET
         let limit = query.limit.unwrap_or(10);
         let offset = query.offset.unwrap_or(0);
         sql.push_str(&format!(" LIMIT {} OFFSET {}", limit, offset));
 
-        // Get total count
         let total: i64 = if params.is_empty() {
             sqlx::query(&count_sql)
                 .fetch_one(&self.pool)
@@ -109,7 +103,6 @@ impl ObjectRepository {
                 .get(0)
         };
 
-        // Get objects
         let rows = if params.is_empty() {
             sqlx::query(&sql)
                 .fetch_all(&self.pool)
@@ -142,7 +135,6 @@ impl ObjectRepository {
     }
 
     pub async fn update(&self, id: i32, req: UpdateObjectRequest) -> Result<Object, ApiError> {
-        // First check if object exists
         self.find_by_id(id).await?;
 
         let mut sql = String::from("UPDATE objects SET updated_at = ?");
@@ -164,7 +156,6 @@ impl ObjectRepository {
 
         sql.push_str(" WHERE id = ?");
 
-        // Execute update
         let mut query = sqlx::query(&sql).bind(now);
         for param in &params {
             query = query.bind(param);
@@ -176,7 +167,6 @@ impl ObjectRepository {
             .await
             .map_err(|e| ApiError::InternalServerError(format!("Database error: {}", e)))?;
 
-        // Return updated object
         self.find_by_id(id).await
     }
 

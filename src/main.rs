@@ -46,9 +46,6 @@ async fn main() -> std::io::Result<()> {
              \nStarting API...\
              \nServer running at http://{}\
              \nDatabase: {}\
-             \nDemo credentials:\
-             \n  -- admin::password123 (admin role)\
-             \n  -- user::userpass (user role)\
              \n--------------------------------",
         config.server_address(),
         config.database_url

@@ -74,7 +74,9 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
             external_id TEXT,
             first_name TEXT NOT NULL,
             last_name TEXT NOT NULL,
-            store_id INTEGER NOT NULL
+            store_id INTEGER NOT NULL,
+            email TEXT,
+            manager_id TEXT
         )
         "#,
     )
@@ -104,6 +106,17 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     )
     .execute(pool)
     .await?;
+
+    // Migrate new columns here
+    sqlx::query("ALTER TABLE employees ADD COLUMN email TEXT")
+        .execute(pool)
+        .await
+        .ok();
+
+    sqlx::query("ALTER TABLE employees ADD COLUMN manager_id INTEGER")
+        .execute(pool)
+        .await
+        .ok();
 
     Ok(())
 }

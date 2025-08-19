@@ -1,9 +1,9 @@
 use crate::models::employee::*;
 use crate::services::EmployeeService;
 use crate::utils::ApiResponse;
-use actix_web::{HttpResponse, ResponseError, Result, get, web};
+use actix_web::{HttpResponse, ResponseError, Result, get, web, post};
 
-#[get("/employees")]
+#[get("/")]
 pub async fn get_employees(
     service: web::Data<EmployeeService>,
     query: web::Query<EmployeeQuery>,
@@ -17,7 +17,7 @@ pub async fn get_employees(
     }
 }
 
-#[get("/employees/{id}")]
+#[get("/{id}")]
 pub async fn get_employee(
     service: web::Data<EmployeeService>,
     path: web::Path<i32>,
@@ -32,7 +32,7 @@ pub async fn get_employee(
     }
 }
 
-#[get("/stores/{store_id}/employees")]
+#[get("/stores/{store_id}")]
 pub async fn get_employees_by_store(
     service: web::Data<EmployeeService>,
     path: web::Path<i32>,
@@ -47,6 +47,24 @@ pub async fn get_employees_by_store(
         Ok(response) => Ok(HttpResponse::Ok().json(ApiResponse::success(
             response,
             "Store employees retrieved successfully",
+        ))),
+        Err(e) => Ok(e.error_response()),
+    }
+}
+
+#[post("/")]
+pub async fn create_employees(
+    service: web::Data<EmployeeService>,
+    request: web::Json<CreateEmployeesRequest>,
+) -> Result<HttpResponse> {
+    print!("test");
+    match service.create_employees(request.employees.clone()).await {
+        Ok(created_employees) => Ok(HttpResponse::Created().json(ApiResponse::success(
+            serde_json::json!({
+                "employees": created_employees,
+                "count": created_employees.len()
+            }),
+            "Employees created successfully",
         ))),
         Err(e) => Ok(e.error_response()),
     }

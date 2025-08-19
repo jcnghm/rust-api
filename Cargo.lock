@@ -1733,6 +1733,7 @@ dependencies = [
  "env_logger",
  "futures-util",
  "jsonwebtoken",
+ "log",
  "num_cpus",
  "rand_core 0.6.4",
  "serde",

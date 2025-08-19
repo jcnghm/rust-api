@@ -37,4 +37,12 @@ impl EmployeeService {
 
         self.get_employees(store_query).await
     }
+
+    pub async fn create_employees(&self, employees: Vec<CreateEmployee>) -> Result<Vec<Employee>, ApiError> {
+        if employees.is_empty() {
+            return Err(ApiError::BadRequest("No employees provided".to_string()));
+        }
+
+        self.repository.create_bulk(employees).await
+    }
 }

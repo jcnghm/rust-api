@@ -18,7 +18,6 @@ A REST API framework built with Rust and Actix Web, featuring JWT authentication
 
 - SQLite database with SQLx ORM
 - Migrations, connection pooling
-- Easy migration path to MySQL/PostgreSQL
 
 **API Capabilities**
 
@@ -44,7 +43,6 @@ A REST API framework built with Rust and Actix Web, featuring JWT authentication
 
 ```bash
 # Clone the repository
-git clone <repository-url>
 cd rust-api-framework
 
 # Create data directory for SQLite database

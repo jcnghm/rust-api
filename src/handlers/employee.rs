@@ -57,7 +57,6 @@ pub async fn create_employees(
     service: web::Data<EmployeeService>,
     request: web::Json<CreateEmployeesRequest>,
 ) -> Result<HttpResponse> {
-    print!("test");
     match service.create_employees(request.employees.clone()).await {
         Ok(created_employees) => Ok(HttpResponse::Created().json(ApiResponse::success(
             serde_json::json!({

@@ -1,12 +1,12 @@
+use crate::errors::ApiError;
+use crate::services::AuthService;
 use actix_web::{
-    dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
     Error, HttpMessage, ResponseError,
     body::EitherBody,
+    dev::{Service, ServiceRequest, ServiceResponse, Transform, forward_ready},
 };
 use futures_util::future::LocalBoxFuture;
-use std::future::{ready, Ready};
-use crate::services::AuthService;
-use crate::errors::ApiError;
+use std::future::{Ready, ready};
 
 pub struct AuthMiddleware {
     auth_service: AuthService,
@@ -57,43 +57,44 @@ where
 
     fn call(&self, req: ServiceRequest) -> Self::Future {
         let auth_service = self.auth_service.clone();
-        
+
         let path = req.path();
         if path == "/token" {
             let fut = self.service.call(req);
-            return Box::pin(async move { 
+            return Box::pin(async move {
                 let res = fut.await?;
                 Ok(res.map_into_left_body())
             });
         }
 
         let auth_header = req.headers().get("Authorization");
-        
+
         let token = match auth_header {
-            Some(header) => {
-                match header.to_str() {
-                    Ok(header_str) => {
-                        if header_str.starts_with("Bearer ") {
-                            &header_str[7..]
-                        } else {
-                            return Box::pin(async move {
-                                let response = ApiError::BadRequest("Invalid authorization header format".to_string())
-                                    .error_response()
-                                    .map_into_right_body();
-                                Ok(ServiceResponse::new(req.into_parts().0, response))
-                            });
-                        }
-                    }
-                    Err(_) => {
+            Some(header) => match header.to_str() {
+                Ok(header_str) => {
+                    if header_str.starts_with("Bearer ") {
+                        &header_str[7..]
+                    } else {
                         return Box::pin(async move {
-                            let response = ApiError::BadRequest("Invalid authorization header".to_string())
-                                .error_response()
-                                .map_into_right_body();
+                            let response = ApiError::BadRequest(
+                                "Invalid authorization header format".to_string(),
+                            )
+                            .error_response()
+                            .map_into_right_body();
                             Ok(ServiceResponse::new(req.into_parts().0, response))
                         });
                     }
                 }
-            }
+                Err(_) => {
+                    return Box::pin(async move {
+                        let response =
+                            ApiError::BadRequest("Invalid authorization header".to_string())
+                                .error_response()
+                                .map_into_right_body();
+                        Ok(ServiceResponse::new(req.into_parts().0, response))
+                    });
+                }
+            },
             None => {
                 return Box::pin(async move {
                     let response = ApiError::BadRequest("Missing authorization header".to_string())
@@ -109,18 +110,15 @@ where
                 // Add claims to request extensions for use in handlers
                 req.extensions_mut().insert(claims);
                 let fut = self.service.call(req);
-                Box::pin(async move { 
+                Box::pin(async move {
                     let res = fut.await?;
                     Ok(res.map_into_left_body())
                 })
             }
-            Err(e) => {
-                Box::pin(async move {
-                    let response = e.error_response()
-                        .map_into_right_body();
-                    Ok(ServiceResponse::new(req.into_parts().0, response))
-                })
-            }
+            Err(e) => Box::pin(async move {
+                let response = e.error_response().map_into_right_body();
+                Ok(ServiceResponse::new(req.into_parts().0, response))
+            }),
         }
     }
 }

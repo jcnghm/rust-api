@@ -15,7 +15,7 @@ impl EmployeeRepository {
     pub async fn find_by_id(&self, id: i32) -> Result<Employee, ApiError> {
         let row = sqlx::query(
             r#"
-            SELECT id, external_id, first_name, last_name, store_id
+            SELECT id, external_id, first_name, last_name, store_id, email
             FROM employees
             WHERE id = ?
             "#,
@@ -32,15 +32,16 @@ impl EmployeeRepository {
             first_name: row.get("first_name"),
             last_name: row.get("last_name"),
             email: row.get("email"),
-            store_id: row.get("store_id")
+            store_id: row.get("store_id"),
         };
 
         Ok(employee)
     }
 
     pub async fn find_all(&self, query: EmployeeQuery) -> Result<(Vec<Employee>, usize), ApiError> {
-        let mut sql =
-            String::from("SELECT id, external_id, first_name, last_name, store_id, email, manager_id FROM employees");
+        let mut sql = String::from(
+            "SELECT id, external_id, first_name, last_name, store_id, email, manager_id FROM employees",
+        );
         let mut count_sql = String::from("SELECT COUNT(*) FROM employees");
         let mut conditions = Vec::new();
         let mut params: Vec<String> = Vec::new();
@@ -64,7 +65,7 @@ impl EmployeeRepository {
             sql.push_str(" AND email = ?");
             params.push(email.clone());
         }
-        
+
         if let Some(external_id) = &query.external_id {
             sql.push_str(" AND external_id = ?");
             params.push(external_id.clone());
@@ -124,19 +125,25 @@ impl EmployeeRepository {
                 first_name: row.get("first_name"),
                 last_name: row.get("last_name"),
                 store_id: row.get("store_id"),
-                email: row.get("email")
+                email: row.get("email"),
             })
             .collect();
 
         Ok((employees, total as usize))
     }
 
-    pub async fn create_bulk(&self, employees: Vec<CreateEmployee>) -> Result<Vec<Employee>, ApiError> {
+    pub async fn create_bulk(
+        &self,
+        employees: Vec<CreateEmployee>,
+    ) -> Result<Vec<Employee>, ApiError> {
         if employees.is_empty() {
             return Ok(Vec::new());
         }
 
-        let mut tx = self.pool.begin().await
+        let mut tx = self
+            .pool
+            .begin()
+            .await
             .map_err(|e| ApiError::InternalServerError(format!("Transaction error: {}", e)))?;
 
         let mut created_ids = Vec::new();
@@ -159,12 +166,10 @@ impl EmployeeRepository {
 
             created_ids.push(result.last_insert_rowid() as i32);
         }
+        tx.commit().await.map_err(|e| {
+            ApiError::InternalServerError(format!("Transaction commit error: {}", e))
+        })?;
 
-        // Commit the transaction
-        tx.commit().await
-            .map_err(|e| ApiError::InternalServerError(format!("Transaction commit error: {}", e)))?;
-
-        // Fetch all created employees
         let mut created_employees = Vec::new();
         for id in created_ids {
             created_employees.push(self.find_by_id(id).await?);

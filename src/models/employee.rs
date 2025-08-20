@@ -8,7 +8,7 @@ pub struct Employee {
     pub first_name: String,
     pub last_name: String,
     pub store_id: Option<i32>,
-    pub email: Option<String>
+    pub email: Option<String>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -19,7 +19,7 @@ pub struct EmployeeQuery {
     pub first_name: Option<String>,
     pub last_name: Option<String>,
     pub email: Option<String>,
-    pub external_id: Option<String>
+    pub external_id: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]

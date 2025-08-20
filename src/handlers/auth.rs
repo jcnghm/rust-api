@@ -1,7 +1,7 @@
-use actix_web::{post, web, HttpResponse, Result, ResponseError};
-use crate::services::AuthService;
 use crate::models::auth::LoginRequest;
+use crate::services::AuthService;
 use crate::utils::ApiResponse;
+use actix_web::{HttpResponse, ResponseError, Result, post, web};
 
 #[post("/token")]
 pub async fn login(

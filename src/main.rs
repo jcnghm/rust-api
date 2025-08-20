@@ -91,6 +91,7 @@ fn configure_routes(config: &mut web::ServiceConfig) {
             web::scope("/employees")
                 .service(handlers::get_employees)
                 .service(handlers::get_employee)
-                .service(handlers::get_employees_by_store),
+                .service(handlers::get_employees_by_store)
+                .service(handlers::create_employees),
         );
 }

@@ -32,20 +32,16 @@ impl fmt::Display for ApiError {
 impl ResponseError for ApiError {
     fn error_response(&self) -> HttpResponse {
         match self {
-            ApiError::BadRequest(msg) => {
-                HttpResponse::BadRequest().json(ErrorResponse {
-                    success: false,
-                    error: msg.clone(),
-                    code: 400,
-                })
-            }
-            ApiError::NotFound(msg) => {
-                HttpResponse::NotFound().json(ErrorResponse {
-                    success: false,
-                    error: msg.clone(),
-                    code: 404,
-                })
-            }
+            ApiError::BadRequest(msg) => HttpResponse::BadRequest().json(ErrorResponse {
+                success: false,
+                error: msg.clone(),
+                code: 400,
+            }),
+            ApiError::NotFound(msg) => HttpResponse::NotFound().json(ErrorResponse {
+                success: false,
+                error: msg.clone(),
+                code: 404,
+            }),
             ApiError::InternalServerError(msg) => {
                 HttpResponse::InternalServerError().json(ErrorResponse {
                     success: false,
@@ -53,13 +49,11 @@ impl ResponseError for ApiError {
                     code: 500,
                 })
             }
-            ApiError::ValidationError(msg) => {
-                HttpResponse::BadRequest().json(ErrorResponse {
-                    success: false,
-                    error: msg.clone(),
-                    code: 400,
-                })
-            }
+            ApiError::ValidationError(msg) => HttpResponse::BadRequest().json(ErrorResponse {
+                success: false,
+                error: msg.clone(),
+                code: 400,
+            }),
         }
     }
 }

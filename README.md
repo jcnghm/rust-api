@@ -36,9 +36,7 @@ A REST API framework built with Rust and Actix Web, featuring JWT authentication
 ### Prerequisites
 
 - Rust 1.70+ and Cargo
-- SQLite3
-- Environment variables configured (see Configuration section)
-
+- SQLite
 ### Installation
 
 ```bash

@@ -78,12 +78,6 @@ The database URL can be configured via environment variables:
 DATABASE_URL=sqlite:./data/app.db
 ```
 
-For future MySQL migration, you can change this to:
-
-```env
-DATABASE_URL=mysql://user:password@localhost/database_name
-```
-
 ## API Endpoints
 
 ### Authentication

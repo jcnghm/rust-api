@@ -134,12 +134,3 @@ JWT_SECRET=your-secret-key-here
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-Built with:
-
-- [Actix Web](https://actix.rs/) - Fast, powerful web framework
-- [serde](https://serde.rs/) - Serialization framework
-- [jsonwebtoken](https://github.com/Keats/jsonwebtoken) - JWT implementation
-- [env_logger](https://github.com/rust-cli/env_logger) - Logging implementation

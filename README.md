@@ -56,7 +56,7 @@ The server will start at `http://127.0.0.1:8080` by default with SQLite database
 
 The application automatically creates and migrates the SQLite database on startup. The database file is created at `./data/app.db` by default.
 
-### Manual Database Setup (Optional)
+### Manual Database Setup
 
 If you want to manually initialize the database with sample data:
 

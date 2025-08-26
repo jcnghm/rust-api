@@ -99,12 +99,10 @@ All endpoints below require `Authorization: Bearer <token>` header:
 ### JWT Authentication
 
 ```bash
-# Login to get token
 curl -X POST http://localhost:8080/token \
   -H "Content-Type: application/json" \
   -d '{"username": "admin", "password": "password123"}'
 
-# Use token in requests
 curl -H "Authorization: Bearer <your-token>" \
   http://localhost:8080/objects
 ```

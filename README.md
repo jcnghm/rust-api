@@ -1,9 +1,15 @@
 <div align="center">
   <img src="https://raw.githubusercontent.com/rust-lang/rust-artwork/master/logo/rust-logo-256x256.png" alt="Rust Logo" width="100">
   
-# Actix Web Rust API
+# API Sandbox
 
-A REST API framework built with Rust and Actix Web, featuring JWT authentication, and CRUD operations with SQLite database support.
+[![Rust Version](https://img.shields.io/badge/rust-1.70%2B-orange.svg)](https://www.rust-lang.org/)
+[![Actix Web](https://img.shields.io/badge/actix--web-4.0%2B-blue.svg)](https://actix.rs/)
+[![SQLite](https://img.shields.io/badge/sqlite-3.0%2B-lightblue.svg)](https://www.sqlite.org/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
+
+A REST API framework for testing API tools, built with Rust and Actix Web, featuring JWT authentication, and CRUD operations with SQLite database support.
 </div>
 
 ## Features

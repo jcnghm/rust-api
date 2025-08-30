@@ -3,7 +3,7 @@ use crate::services::ObjectService;
 use crate::utils::ApiResponse;
 use actix_web::{HttpResponse, ResponseError, Result, delete, get, patch, post, put, web};
 
-#[get("/objects")]
+#[get("/")]
 pub async fn get_objects(
     service: web::Data<ObjectService>,
     query: web::Query<ObjectQuery>,
@@ -17,7 +17,7 @@ pub async fn get_objects(
     }
 }
 
-#[get("/objects/{id}")]
+#[get("/{id}")]
 pub async fn get_object(
     service: web::Data<ObjectService>,
     path: web::Path<i32>,
@@ -30,7 +30,7 @@ pub async fn get_object(
     }
 }
 
-#[post("/objects")]
+#[post("/")]
 pub async fn create_object(
     service: web::Data<ObjectService>,
     req: web::Json<CreateObjectRequest>,
@@ -42,7 +42,7 @@ pub async fn create_object(
     }
 }
 
-#[put("/objects/{id}")]
+#[put("/{id}")]
 pub async fn update_object(
     service: web::Data<ObjectService>,
     path: web::Path<i32>,
@@ -58,7 +58,7 @@ pub async fn update_object(
     }
 }
 
-#[patch("/objects/{id}")]
+#[patch("/{id}")]
 pub async fn patch_object(
     service: web::Data<ObjectService>,
     path: web::Path<i32>,
@@ -74,7 +74,7 @@ pub async fn patch_object(
     }
 }
 
-#[delete("/objects/{id}")]
+#[delete("/{id}")]
 pub async fn delete_object(
     service: web::Data<ObjectService>,
     path: web::Path<i32>,

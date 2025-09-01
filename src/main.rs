@@ -15,8 +15,8 @@ mod utils;
 use config::AppConfig;
 use database::create_pool;
 use middleware::AuthMiddleware;
-use repositories::{EmployeeRepository, ObjectRepository};
-use services::{AuthService, EmployeeService, ObjectService};
+use repositories::{EmployeeRepository, ObjectRepository, TaskRepository};
+use services::{AuthService, EmployeeService, ObjectService, TaskService};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -38,7 +38,8 @@ async fn main() -> std::io::Result<()> {
 
     println!("Initializing services and repositories...");
     let object_service = Arc::new(ObjectService::new(ObjectRepository::new(pool.clone())));
-    let employee_service = Arc::new(EmployeeService::new(EmployeeRepository::new(pool)));
+    let employee_service = Arc::new(EmployeeService::new(EmployeeRepository::new(pool.clone())));
+    let task_service = Arc::new(TaskService::new(TaskRepository::new(pool.clone())));
     let auth_service = AuthService::new();
 
     println!(
@@ -55,12 +56,14 @@ async fn main() -> std::io::Result<()> {
 
     let object_service_data = web::Data::from(object_service);
     let employee_service_data = web::Data::from(employee_service);
+    let task_service_data = web::Data::from(task_service.clone());
     let auth_service_data = web::Data::new(auth_service.clone());
 
     HttpServer::new(move || {
         App::new()
             .app_data(object_service_data.clone())
             .app_data(employee_service_data.clone())
+            .app_data(task_service_data.clone())
             .app_data(auth_service_data.clone())
             .wrap(Logger::default())
             .wrap(AuthMiddleware::new(auth_service.clone()))
@@ -93,5 +96,14 @@ fn configure_routes(config: &mut web::ServiceConfig) {
                 .service(handlers::get_employee)
                 .service(handlers::get_employees_by_store)
                 .service(handlers::create_employees),
+        )
+        .service(
+            web::scope("/tasks")
+                .service(handlers::get_tasks)
+                .service(handlers::get_task)
+                .service(handlers::create_task)
+                .service(handlers::update_task)
+                .service(handlers::delete_task)
+                .service(handlers::assign_task),
         );
 }

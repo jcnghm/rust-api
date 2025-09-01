@@ -1,7 +1,7 @@
 <div align="center">
   <img src="https://raw.githubusercontent.com/rust-lang/rust-artwork/master/logo/rust-logo-256x256.png" alt="Rust Logo" width="100">
   
-# Rust API Web Server
+# Rust API/Web Server
 
 [![Rust Version](https://img.shields.io/badge/rust-1.70%2B-orange.svg)](https://www.rust-lang.org/)
 [![Actix Web](https://img.shields.io/badge/actix--web-4.0%2B-blue.svg)](https://actix.rs/)

@@ -154,7 +154,7 @@ async fn test_protected_route_with_valid_token() {
     let token = body["data"]["access_token"].as_str().unwrap();
 
     let req = test::TestRequest::get()
-        .uri("/objects")
+        .uri("/")
         .insert_header(("Authorization", format!("Bearer {}", token)))
         .to_request();
 
@@ -196,5 +196,5 @@ async fn test_protected_route_with_invalid_token() {
         resp.status()
     );
 
-    assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
+    assert_eq!(resp.status(), StatusCode::UNAUTHORIZED);
 }

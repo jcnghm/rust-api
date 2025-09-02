@@ -47,7 +47,7 @@ impl TaskRepository {
     pub async fn find_by_id(&self, id: i32) -> Result<Task, ApiError> {
         let row = sqlx::query(
             r#"
-            SELECT id, title, description, priority_level, status, assigned_to, completed_at, created_at, updated_at
+            SELECT id, title, description, priority_level, status, assigned_to, completed_at, created_at, updated_at, deleted_at
             FROM tasks
             WHERE id = ?
             "#,
@@ -90,7 +90,7 @@ impl TaskRepository {
 
     pub async fn find_all(&self, query: TaskQuery) -> Result<(Vec<Task>, usize), ApiError> {
         let mut sql = String::from(
-            "SELECT id, title, description, priority_level, status, assigned_to, completed_at, created_at, updated_at FROM tasks",
+            "SELECT id, title, description, priority_level, status, assigned_to, completed_at, created_at, updated_at, deleted_at FROM tasks",
         );
         let mut count_sql = String::from("SELECT COUNT(*) FROM tasks");
         let mut conditions = Vec::new();

@@ -69,7 +69,7 @@ impl AuthService {
             token,
             &DecodingKey::from_secret(self.jwt_secret.as_ref()),
             &Validation::new(Algorithm::HS256)
-        ).map_err(|_| ApiError::BadRequest("Invalid token".to_string()))?;
+        ).map_err(|_| ApiError::AuthorizationError("Invalid token".to_string()))?;
 
         Ok(token_data.claims)
     }

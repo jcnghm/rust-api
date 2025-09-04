@@ -39,6 +39,26 @@ pub async fn create_test_pool() -> SqlitePool {
     .await
     .unwrap();
 
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS tasks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            description TEXT,
+            priority_level TEXT,
+            status TEXT NOT NULL,
+            assigned_to INTEGER,
+            completed_at DATETIME,
+            created_at DATETIME NOT NULL,
+            updated_at DATETIME NOT NULL,
+            FOREIGN KEY (assigned_to) REFERENCES employees(id) ON DELETE SET NULL
+        )
+        "#
+    )
+    .execute(&pool)
+    .await
+    .unwrap();
+
     pool
 }
 

@@ -9,6 +9,7 @@ pub enum ApiError {
     NotFound(String),
     InternalServerError(String),
     ValidationError(String),
+    AuthorizationError(String),
 }
 
 #[derive(Serialize)]
@@ -25,6 +26,7 @@ impl fmt::Display for ApiError {
             ApiError::NotFound(msg) => write!(f, "Not Found: {}", msg),
             ApiError::InternalServerError(msg) => write!(f, "Internal Server Error: {}", msg),
             ApiError::ValidationError(msg) => write!(f, "Validation Error: {}", msg),
+            ApiError::AuthorizationError(msg) => write!(f, "Authorization Error: {}", msg),
         }
     }
 }
@@ -54,6 +56,11 @@ impl ResponseError for ApiError {
                 error: msg.clone(),
                 code: 400,
             }),
+            ApiError::AuthorizationError(msg) => HttpResponse::Unauthorized().json(ErrorResponse {
+                success: false,
+                error: msg.clone(),
+                code: 401,
+            }), 
         }
     }
 }

@@ -8,7 +8,7 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
 
-A REST API web server framework for testing API tools, built with Rust and Actix Web, featuring JWT authentication, and CRUD operations with SQLite database support.
+A REST API web server framework for testing API tools, built with Rust and Actix Web, featuring authentication, and CRUD operations with SQLite database support.
 </div>
 
 ## Features

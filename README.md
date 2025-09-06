@@ -75,8 +75,7 @@ sqlite3 data/app.db < scripts/init_db.sql
 
 ### Database Configuration
 
-The database URL can be configured via environment variables:
-
+The database URL can be configured by setting the .ENV variable:
 ```env
 DATABASE_URL=sqlite:./data/app.db
 ```

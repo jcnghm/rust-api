@@ -15,9 +15,8 @@ A REST API web server framework for testing API tools, built with Rust and Actix
 
 **Authentication & Authorization**
 
-- JWT-based authentication with custom middleware
+- Token authentication with custom middleware
 - Role-based access control (admin/user roles)
-- Secure token validation
 
 **Database Support**
 

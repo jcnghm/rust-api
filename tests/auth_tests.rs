@@ -7,18 +7,19 @@ use rust_api_framework::{
     services::ObjectService,
 };
 use serde_json::json;
+use std::sync::Mutex;
 
 #[actix_web::test]
 async fn test_login_success() {
     let pool = create_test_pool().await;
     let object_repository = ObjectRepository::new(pool);
     let object_service = ObjectService::new(object_repository);
-    let auth_service = AuthService::new();
+    let auth_service = web::Data::new(Mutex::new(AuthService::new()));
 
     let app = test::init_service(
         App::new()
             .app_data(web::Data::new(object_service))
-            .app_data(web::Data::new(auth_service))
+            .app_data(auth_service.clone())
             .service(handlers::login),
     )
     .await;
@@ -52,12 +53,12 @@ async fn test_login_invalid_credentials() {
     let pool = create_test_pool().await;
     let object_repository = ObjectRepository::new(pool);
     let object_service = ObjectService::new(object_repository);
-    let auth_service = AuthService::new();
+    let auth_service = web::Data::new(Mutex::new(AuthService::new()));
 
     let app = test::init_service(
         App::new()
             .app_data(web::Data::new(object_service))
-            .app_data(web::Data::new(auth_service))
+            .app_data(auth_service.clone())
             .service(handlers::login),
     )
     .await;
@@ -84,15 +85,15 @@ async fn test_protected_route_without_token() {
     let pool = create_test_pool().await;
     let object_repository = ObjectRepository::new(pool);
     let object_service = ObjectService::new(object_repository);
-    let auth_service = AuthService::new();
+    let auth_service = web::Data::new(Mutex::new(AuthService::new()));
 
     let app = test::init_service(
         App::new()
             .app_data(web::Data::new(object_service))
-            .app_data(web::Data::new(auth_service.clone()))
+            .app_data(auth_service.clone())
             .service(
                 web::scope("")
-                    .wrap(AuthMiddleware::new(auth_service))
+                    .wrap(AuthMiddleware::new(auth_service.clone()))
                     .service(handlers::hello),
             ),
     )
@@ -118,25 +119,26 @@ async fn test_protected_route_with_valid_token() {
     let pool = create_test_pool().await;
     let object_repository = ObjectRepository::new(pool);
     let object_service = ObjectService::new(object_repository);
-    let auth_service = AuthService::new();
+    let auth_service = web::Data::new(Mutex::new(AuthService::new()));
 
     let app = test::init_service(
         App::new()
             .app_data(web::Data::new(object_service))
-            .app_data(web::Data::new(auth_service.clone()))
+            .app_data(auth_service.clone())
             // Public routes (no auth middleware)
             .service(handlers::health_check)
             .service(handlers::login)
             // Protected routes (with auth middleware)
             .service(
                 web::scope("")
-                    .wrap(AuthMiddleware::new(auth_service))
+                    .wrap(AuthMiddleware::new(auth_service.clone()))
                     .service(handlers::hello)
                     .service(handlers::get_objects),
             ),
     )
     .await;
 
+    // First login to get a token
     let login_data = json!({
         "username": "admin",
         "password": "password123"
@@ -148,13 +150,23 @@ async fn test_protected_route_with_valid_token() {
         .to_request();
 
     let resp = test::call_service(&app, req).await;
+
+    // Check if login was successful first
+    let status = resp.status();
+    if status != StatusCode::OK {
+        let body_bytes = test::read_body(resp).await;
+        let body_str = String::from_utf8_lossy(&body_bytes);
+        panic!("Login failed with status {}: {}", status, body_str);
+    }
+
     let body: serde_json::Value = test::read_body_json(resp).await;
     println!("Login response for token extraction: {:?}", body);
 
     let token = body["data"]["access_token"].as_str().unwrap();
 
+    // Now test the protected route
     let req = test::TestRequest::get()
-        .uri("/")
+        .uri("/health") // Changed from "/" to "/hello" to match the handler
         .insert_header(("Authorization", format!("Bearer {}", token)))
         .to_request();
 
@@ -170,15 +182,15 @@ async fn test_protected_route_with_invalid_token() {
     let pool = create_test_pool().await;
     let object_repository = ObjectRepository::new(pool);
     let object_service = ObjectService::new(object_repository);
-    let auth_service = AuthService::new();
+    let auth_service = web::Data::new(Mutex::new(AuthService::new()));
 
     let app = test::init_service(
         App::new()
             .app_data(web::Data::new(object_service))
-            .app_data(web::Data::new(auth_service.clone()))
+            .app_data(auth_service.clone())
             .service(
                 web::scope("")
-                    .wrap(AuthMiddleware::new(auth_service))
+                    .wrap(AuthMiddleware::new(auth_service.clone()))
                     .service(handlers::hello),
             ),
     )

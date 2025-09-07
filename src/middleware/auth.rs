@@ -1,19 +1,20 @@
 use crate::errors::ApiError;
 use crate::services::AuthService;
 use actix_web::{
-    Error, HttpMessage, ResponseError,
+    Error, HttpMessage, ResponseError, web,
     body::EitherBody,
     dev::{Service, ServiceRequest, ServiceResponse, Transform, forward_ready},
 };
 use futures_util::future::LocalBoxFuture;
 use std::future::{Ready, ready};
+use std::sync::Mutex;
 
 pub struct AuthMiddleware {
-    auth_service: AuthService,
+    auth_service: web::Data<Mutex<AuthService>>,
 }
 
 impl AuthMiddleware {
-    pub fn new(auth_service: AuthService) -> Self {
+    pub fn new(auth_service: web::Data<Mutex<AuthService>>) -> Self {
         Self { auth_service }
     }
 }
@@ -40,7 +41,7 @@ where
 
 pub struct AuthMiddlewareService<S> {
     service: S,
-    auth_service: AuthService,
+    auth_service: web::Data<Mutex<AuthService>>,
 }
 
 impl<S, B> Service<ServiceRequest> for AuthMiddlewareService<S>
@@ -59,7 +60,7 @@ where
         let auth_service = self.auth_service.clone();
 
         let path = req.path();
-        if path == "/token" {
+        if path == "/token" || path == "/refresh" {
             let fut = self.service.call(req);
             return Box::pin(async move {
                 let res = fut.await?;
@@ -105,7 +106,14 @@ where
             }
         };
 
-        match auth_service.verify_token(token) {
+        let token_str = token.to_string();
+        // Verify token before entering async block
+        let verification_result = {
+            let service_guard = auth_service.lock().unwrap();
+            service_guard.verify_token(&token_str)
+        };
+
+        match verification_result {
             Ok(claims) => {
                 // Add claims to request extensions for use in handlers
                 req.extensions_mut().insert(claims);

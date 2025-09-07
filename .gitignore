@@ -6,3 +6,4 @@
 .env.*.local
 /data
 /scripts
+Cargo.lock

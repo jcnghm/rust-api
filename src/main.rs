@@ -1,5 +1,6 @@
 use actix_web::{App, HttpServer, middleware::Logger, web};
 use num_cpus;
+use std::sync::Mutex;
 use std::{sync::Arc, time::Duration};
 
 mod config;
@@ -40,14 +41,18 @@ async fn main() -> std::io::Result<()> {
     let object_service = Arc::new(ObjectService::new(ObjectRepository::new(pool.clone())));
     let employee_service = Arc::new(EmployeeService::new(EmployeeRepository::new(pool.clone())));
     let task_service = Arc::new(TaskService::new(TaskRepository::new(pool.clone())));
-    let auth_service = AuthService::new();
+    let auth_service = web::Data::new(Mutex::new(AuthService::new()));
+    let workers = num_cpus::get();
 
     println!(
         "--------------------------------\
-             \nStarting API...\
-             \nServer running at http://{}\
-             \nDatabase: {}\
-             \n--------------------------------",
+            \nStarting API...\
+            \nUsing {} workers\
+            \n--------------------------------\
+            \nServer running at http://{}\
+            \nDatabase: {}\
+            \n--------------------------------",
+        workers,
         config.server_address(),
         config.database_url
     );
@@ -57,8 +62,9 @@ async fn main() -> std::io::Result<()> {
     let object_service_data = web::Data::from(object_service);
     let employee_service_data = web::Data::from(employee_service);
     let task_service_data = web::Data::from(task_service.clone());
-    let auth_service_data = web::Data::new(auth_service.clone());
+    let auth_service_data = web::Data::new(Mutex::new(AuthService::new()));
 
+    // Create and run the HTTP server
     HttpServer::new(move || {
         App::new()
             .app_data(object_service_data.clone())
@@ -80,6 +86,7 @@ async fn main() -> std::io::Result<()> {
 fn configure_routes(config: &mut web::ServiceConfig) {
     config
         .service(handlers::login)
+        .service(handlers::refresh_token)
         .service(handlers::health_check)
         .service(
             web::scope("/objects")

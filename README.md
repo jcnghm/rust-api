@@ -83,6 +83,7 @@ DATABASE_URL=sqlite:./data/app.db
 ### Authentication
 
 - `POST /token` - Login with username/password
+- `POST /refresh` - Exchange refresh token for new token pair
 
 ### Protected Endpoints
 

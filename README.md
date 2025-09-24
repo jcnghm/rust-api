@@ -53,7 +53,7 @@ mkdir -p data
 cargo run
 ```
 
-The server will start at `http://127.0.0.1:8080` by default with SQLite database at `./data/app.db`.
+The server will start at `http://127.0.0.1:8080` by default.
 
 ## Database Setup
 

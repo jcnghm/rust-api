@@ -1,9 +1,7 @@
-use std::path;
-
 use crate::models::task::*;
 use crate::services::TaskService;
 use crate::utils::ApiResponse;
-use actix_web::{HttpResponse, ResponseError, Result, delete, get, patch, post, put, web};
+use actix_web::{HttpResponse, ResponseError, Result, delete, get, patch, post, web};
 
 #[get("/")]
 pub async fn get_tasks(

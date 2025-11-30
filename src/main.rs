@@ -57,6 +57,7 @@ async fn main() -> std::io::Result<()> {
         config.database_url
     );
 
+    // TEST COMMENT
     let server_addr = config.server_address();
 
     let object_service_data = web::Data::from(object_service);

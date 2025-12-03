@@ -65,6 +65,7 @@ async fn main() -> std::io::Result<()> {
     let auth_service_data = web::Data::new(Mutex::new(AuthService::new()));
 
     // Create and run the HTTP server
+    // Test commit
     HttpServer::new(move || {
         App::new()
             .app_data(object_service_data.clone())
